@@ -1,5 +1,6 @@
 import "jest";
 import LDFetch from "ldfetch";
+import ClusterFinder from "../../ClusterFinder";
 import Context from "../../Context";
 import TravelMode from "../../enums/TravelMode";
 import ConnectionsFetcherLazy from "../../fetcher/connections/lazy/ConnectionsFetcherLazy";
@@ -54,6 +55,7 @@ describe("[QueryRunnerExponential]", () => {
         reachableStopsFinder,
         reachableStopsFinder,
         createJourneyExtractor(),
+        new ClusterFinder(),
       );
     };
 

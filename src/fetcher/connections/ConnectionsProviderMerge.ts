@@ -53,17 +53,27 @@ export default class ConnectionsProviderMerge implements IConnectionsProvider {
   }
 
   private options: IConnectionsIteratorOptions;
+  private connectionsFetcherFactory: ConnectionsFetcherFactory;
   private connectionsFetchers: IConnectionsFetcher[];
 
   constructor(
     @inject(TYPES.ConnectionsFetcherFactory) connectionsFetcherFactory: ConnectionsFetcherFactory,
     @inject(TYPES.Catalog) catalog: Catalog,
   ) {
+    this.connectionsFetcherFactory = connectionsFetcherFactory;
     this.connectionsFetchers = [];
 
     for (const { accessUrl, travelMode } of catalog.connectionsSourceConfigs) {
       this.connectionsFetchers.push(connectionsFetcherFactory(accessUrl, travelMode));
     }
+  }
+
+  public resetConnectionSources() {
+    this.connectionsFetchers = [];
+  }
+
+  public addConnectionSource(accessUrl, travelMode) {
+    this.connectionsFetchers.push(this.connectionsFetcherFactory(accessUrl, travelMode));
   }
 
   public prefetchConnections(): void {

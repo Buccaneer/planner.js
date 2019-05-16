@@ -1,11 +1,13 @@
 import { ArrayIterator, AsyncIterator } from "asynciterator";
 import { inject, injectable, tagged } from "inversify";
+import ClusterFinder from "../../ClusterFinder";
 import Context from "../../Context";
 import DropOffType from "../../enums/DropOffType";
 import EventType from "../../enums/EventType";
 import PickupType from "../../enums/PickupType";
 import ReachableStopsFinderMode from "../../enums/ReachableStopsFinderMode";
 import ReachableStopsSearchPhase from "../../enums/ReachableStopsSearchPhase";
+import ConnectionsProviderMerge from "../../fetcher/connections/ConnectionsProviderMerge";
 import IConnection from "../../fetcher/connections/IConnection";
 import IConnectionsProvider from "../../fetcher/connections/IConnectionsProvider";
 import IStop from "../../fetcher/stops/IStop";
@@ -61,6 +63,8 @@ export default class CSAProfile implements IPublicTransportPlanner {
   private query: IResolvedQuery;
   private connectionsIterator: AsyncIterator<IConnection>;
 
+  private clusterFinder: ClusterFinder;
+
   constructor(
     @inject(TYPES.ConnectionsProvider)
       connectionsProvider: IConnectionsProvider,
@@ -77,6 +81,8 @@ export default class CSAProfile implements IPublicTransportPlanner {
       finalReachableStopsFinder: IReachableStopsFinder,
     @inject(TYPES.JourneyExtractor)
       journeyExtractor: IJourneyExtractor,
+    @inject(TYPES.ClusterFinder)
+      clusterFinder: ClusterFinder,
     @inject(TYPES.Context)
       context?: Context,
   ) {
@@ -86,11 +92,21 @@ export default class CSAProfile implements IPublicTransportPlanner {
     this.transferReachableStopsFinder = transferReachableStopsFinder;
     this.finalReachableStopsFinder = finalReachableStopsFinder;
     this.journeyExtractor = journeyExtractor;
+    this.clusterFinder = clusterFinder;
     this.context = context;
   }
 
   public async plan(query: IResolvedQuery): Promise<AsyncIterator<IPath>> {
     this.query = query;
+
+    // use different sources depending on what the cluster said
+    const departureStop: IStop = this.query.from[0] as IStop;
+    const arrivalStop: IStop = this.query.to[0] as IStop;
+    const sources = this.clusterFinder.findClusters(arrivalStop.id, departureStop.id);
+    (this.connectionsProvider as ConnectionsProviderMerge).resetConnectionSources();
+    for (const source of await sources) {
+      (this.connectionsProvider as ConnectionsProviderMerge).addConnectionSource(source.url, source.travelMode);
+    }
 
     this.setBounds();
 

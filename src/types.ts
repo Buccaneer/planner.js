@@ -25,6 +25,8 @@ const TYPES = {
   JourneyExtractor: Symbol("JourneyExtractor"),
   LDFetch: Symbol("LDFetch"),
   Catalog: Symbol("Catalog"),
+
+  ClusterFinder: Symbol("ClusterFinder"),
 };
 
 export default TYPES;

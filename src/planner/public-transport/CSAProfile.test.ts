@@ -1,5 +1,6 @@
 import "jest";
 import LDFetch from "ldfetch";
+import ClusterFinder from "../../ClusterFinder";
 import Defaults from "../../Defaults";
 import TravelMode from "../../enums/TravelMode";
 import ConnectionsFetcherLazy from "../../fetcher/connections/lazy/ConnectionsFetcherLazy";
@@ -45,6 +46,7 @@ describe("[PublicTransportPlannerCSAProfile]", () => {
         reachableStopsFinder,
         reachableStopsFinder,
         journeyExtractor,
+        new ClusterFinder(),
       );
     };
 
@@ -196,6 +198,7 @@ describe("[PublicTransportPlannerCSAProfile]", () => {
         reachableStopsFinder,
         reachableStopsFinder,
         journeyExtractor,
+        new ClusterFinder(),
       );
 
       return new QueryRunnerDefault(locationResolver, CSA);

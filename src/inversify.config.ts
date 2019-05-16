@@ -1,7 +1,9 @@
 import { Container, interfaces } from "inversify";
+import "reflect-metadata";
 import Catalog from "./Catalog";
 import catalogDeLijn from "./catalog.delijn";
 import catalogNmbs from "./catalog.nmbs";
+import ClusterFinder from "./ClusterFinder";
 import Context from "./Context";
 import ReachableStopsSearchPhase from "./enums/ReachableStopsSearchPhase";
 import TravelMode from "./enums/TravelMode";
@@ -53,7 +55,7 @@ container.bind<IReachableStopsFinder>(TYPES.ReachableStopsFinder)
 container.bind<IReachableStopsFinder>(TYPES.ReachableStopsFinder)
   .to(ReachableStopsFinderRoadPlannerCached).whenTargetTagged("phase", ReachableStopsSearchPhase.Final);
 
-container.bind<IConnectionsProvider>(TYPES.ConnectionsProvider).to(ConnectionsProviderPrefetch).inSingletonScope();
+container.bind<IConnectionsProvider>(TYPES.ConnectionsProvider).to(ConnectionsProviderMerge).inSingletonScope();
 container.bind<IConnectionsFetcher>(TYPES.ConnectionsFetcher).to(ConnectionsFetcherLazy);
 container.bind<interfaces.Factory<IConnectionsFetcher>>(TYPES.ConnectionsFetcherFactory)
   .toFactory<IConnectionsFetcher>(
@@ -82,6 +84,8 @@ container.bind<interfaces.Factory<IStopsFetcher>>(TYPES.StopsFetcherFactory)
 
 // Bind catalog
 container.bind<Catalog>(TYPES.Catalog).toConstantValue(catalogNmbs);
+
+container.bind<ClusterFinder>(TYPES.ClusterFinder).to(ClusterFinder);
 
 // const combinedCatalog = Catalog.combine(catalogNmbs, catalogDeLijn);
 // container.bind<Catalog>(TYPES.Catalog).toConstantValue(combinedCatalog);
