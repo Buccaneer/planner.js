@@ -102,7 +102,7 @@ export default class CSAProfile implements IPublicTransportPlanner {
     // use different sources depending on what the cluster said
     const departureStop: IStop = this.query.from[0] as IStop;
     const arrivalStop: IStop = this.query.to[0] as IStop;
-    const sources = this.clusterFinder.findClusters(arrivalStop.id, departureStop.id);
+    const sources = await this.clusterFinder.findClusters(arrivalStop.id, departureStop.id);
     (this.connectionsProvider as ConnectionsProviderMerge).resetConnectionSources();
     for (const source of await sources) {
       (this.connectionsProvider as ConnectionsProviderMerge).addConnectionSource(source.url, source.travelMode);

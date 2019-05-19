@@ -49,6 +49,7 @@ export default class HydraPageIterator extends BufferedIterator<IHydraPage> {
   }
 
   private async loadPage(url: string) {
+    // console.log(url);
     await this.ldFetch.get(url)
       .then((response) => {
 

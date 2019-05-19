@@ -83,7 +83,8 @@ container.bind<interfaces.Factory<IStopsFetcher>>(TYPES.StopsFetcherFactory)
   );
 
 // Bind catalog
-container.bind<Catalog>(TYPES.Catalog).toConstantValue(catalogNmbs);
+// container.bind<Catalog>(TYPES.Catalog).toConstantValue(catalogNmbs);
+container.bind<Catalog>(TYPES.Catalog).toConstantValue(catalogDeLijn);
 
 container.bind<ClusterFinder>(TYPES.ClusterFinder).to(ClusterFinder);
 
