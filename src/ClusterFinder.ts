@@ -7,7 +7,7 @@ import TravelMode from "./enums/TravelMode";
 @injectable()
 export default class ClusterFinder {
 
-  private baseUrl = "http://localhost:3000/delijn/";
+  private baseUrl = config.agencyUrl;
   private index = null;
   private summary = null;
 
