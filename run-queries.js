@@ -1,13 +1,15 @@
 /* jshint esversion: 6*/
 const Planner = require('./lib/Planner.js').default;
 const fs = require('fs');
+const config = require('./config.js');
+const queriesPath = config.queryPath + '/queries.json';
 
 let planner = new Planner();
 let queryTemplate = {
   from: 'https://data.delijn.be/stops/200065', // Gent Zuid
   to: 'https://data.delijn.be/stops/208447', // Zottegem Bruggenhoek
-  minimumDepartureTime: new Date('2019-05-16T03:00:00.000Z'), // new Date("Wed May 15 2019 03:00:00"),
-  maximumArrivalTime: new Date('2019-05-16T22:00:00.000Z'), // new Date("Fri May 17 2019 22:00:00"),
+  minimumDepartureTime: new Date('2019-05-16T06:00:00.000Z'), // new Date("Wed May 15 2019 03:00:00"),
+  maximumArrivalTime: new Date('2019-05-16T09:00:00.000Z'), // new Date("Fri May 17 2019 22:00:00"),
   publicTransportOnly: true,
 
   walkingSpeed: 3, // KmH
@@ -23,26 +25,13 @@ let queryTemplate = {
   maximumTransfers: 4,
 };
 
-let queries = [{
-  from: 'https://data.delijn.be/stops/200065',
-  to: 'https://data.delijn.be/stops/208447',
-  minimumDepartureTime: new Date('2019-05-16T03:00:00.000Z'),
-  maximumArrivalTime: new Date('2019-05-16T22:00:00.000Z'),
-}, {
-  from: 'https://data.delijn.be/stops/200065',
-  to: 'https://data.delijn.be/stops/208447',
-  minimumDepartureTime: new Date('2019-05-16T03:00:00.000Z'),
-  maximumArrivalTime: new Date('2019-05-16T22:00:00.000Z'),
-},
-{
-  from: 'https://data.delijn.be/stops/200065',
-  to: 'https://data.delijn.be/stops/208447',
-  minimumDepartureTime: new Date('2019-05-16T03:00:00.000Z'),
-  maximumArrivalTime: new Date('2019-05-16T22:00:00.000Z'),
+let queries = JSON.parse(fs.readFileSync(queriesPath));
+for (let query of queries) {
+  query.minimumDepartureTime = new Date(query.minimumDepartureTime);
+  query.maximumArrivalTime = new Date(query.maximumArrivalTime);
 }
-];
 
-// NOTE: make sure to run queries sequentially so they don't influence eachother
+// NOTE: queries run sequentially so they don't influence eachother
 runQuery(queries, 0, planner, queryTemplate);
 
 function runQuery(queries, index, planner, queryTemplate) {
@@ -60,20 +49,20 @@ function runQuery(queries, index, planner, queryTemplate) {
   log.paths = [];
   log.startTime = new Date().toISOString();
   planner.query(queryTemplate)
-    .take(3)
+    .take(10)
     .on('data', (path) => {
         log.paths.push({path: path, time: new Date().toISOString()});
       })
     .on('end', () => {
         log.stopTime = new Date().toISOString();
-        fs.writeFileSync('./results/' + index + '.json', JSON.stringify(log));
+        fs.writeFileSync(config.resultsPath + '/' + index + '.json', JSON.stringify(log));
         if (++index < queries.length) {
           runQuery(queries, index, planner, queryTemplate);
         }
       })
     .on('error', (error) => {
-        log.error = error;
-        fs.writeFileSync('./results/' + index + '.json', JSON.stringify(log));
+        log.error = error.message;
+        fs.writeFileSync(config.resultsPath + '/' + index + '.json', JSON.stringify(log));
         if (++index < queries.length) {
           runQuery(queries, index, planner, queryTemplate);
         }

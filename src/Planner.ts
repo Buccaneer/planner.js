@@ -56,6 +56,10 @@ export default class Planner implements EventEmitter {
       }
     });
 
+    this.context.on("could-not-find-path", (e) => {
+      iterator.emit("end", "end");
+    });
+
     return iterator;
   }
 

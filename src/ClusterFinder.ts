@@ -1,5 +1,6 @@
 import http from "http";
 import { inject, injectable, tagged } from "inversify";
+import config from "../config.js";
 import dijkstra from "../dijkstra.js";
 import TravelMode from "./enums/TravelMode";
 
@@ -20,25 +21,16 @@ export default class ClusterFinder {
     const startCluster = this.index[departureStop];
     const stopCluster = this.index[arrivalStop];
     let clusters = dijkstra(this.summary, startCluster, stopCluster);
+    console.log(clusters);
     clusters = clusters.map((cluster: number) => {
       return { url: this.baseUrl + cluster + "/connections", travelMode: TravelMode.Bus };
     });
-    clusters = [];
-    for (let i = 0; i < 50; ++i) {
-      clusters.push({ url: this.baseUrl + i + "/connections", travelMode: TravelMode.Bus });
+    // Return "cluster" n where n is the amount of clusters as source if clustering is disabled
+    // The server has clusters 0 to n-1 as actual clusters and "cluster" n as a benchmark with all connections in one
+    if (config.disableClustering) {
+      return [{ url: this.baseUrl + this.summary.length + "/connections", travelMode: TravelMode.Bus }];
     }
-    // console.log(clusters);
     return clusters;
-
-    // return [{ url: "https://graph.irail.be/sncb/connections", travelMode: TravelMode.Train }];
-    /*return [
-      { url: "https://openplanner.ilabt.imec.be/delijn/Antwerpen/connections", travelMode: TravelMode.Bus },
-      { url: "https://openplanner.ilabt.imec.be/delijn/Limburg/connections", travelMode: TravelMode.Bus },
-      { url: "https://openplanner.ilabt.imec.be/delijn/Oost-Vlaanderen/connections", travelMode: TravelMode.Bus },
-      { url: "https://openplanner.ilabt.imec.be/delijn/Vlaams-Brabant/connections", travelMode: TravelMode.Bus },
-      { url: "https://openplanner.ilabt.imec.be/delijn/West-Vlaanderen/connections", travelMode: TravelMode.Bus },
-      { url: "https://openplanner.ilabt.imec.be/delijn/undefined/connections", travelMode: TravelMode.Bus },
-    ];*/
   }
 
   private async fetchIndex() {

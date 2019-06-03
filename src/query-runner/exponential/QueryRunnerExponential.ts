@@ -55,12 +55,14 @@ export default class QueryRunnerExponential implements IQueryRunner {
     const baseQuery: IResolvedQuery = await this.resolveBaseQuery(query);
 
     if (baseQuery.publicTransportOnly) {
-      const queryIterator = new ExponentialQueryIterator(baseQuery, 15 * 60 * 1000);
+      const queryIterator = new ExponentialQueryIterator(this.context, baseQuery, 15 * 60 * 1000);
 
       const subqueryIterator = new FlatMapIterator<IResolvedQuery, IPath>(
         queryIterator,
         this.runSubquery.bind(this),
       );
+
+      subqueryIterator.on("end", () => { console.log("end subquery iterator"); });
 
       return new FilterUniqueIterator<IPath>(subqueryIterator, Path.compareEquals);
 
