@@ -1,0 +1,19 @@
+#wrapper {
+	width: 1600px;
+	display: flex;
+}
+#map { 
+	height: 700px;
+	width: 1200px;
+}
+#text {
+	width: 300px;
+	/**background: lightgreen;*/
+	margin-left: 15px;
+}
+#knop {
+	float: right;
+}
+#showClusters {
+	float: right;
+}
