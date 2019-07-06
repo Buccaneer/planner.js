@@ -49,17 +49,19 @@ function runQuery(queries, index, planner, queryTemplate) {
   log.paths = [];
   log.startTime = new Date().toISOString();
   planner.query(queryTemplate)
-    .take(10)
     .on('data', (path) => {
         log.paths.push({path: path, time: new Date().toISOString()});
       })
-    .on('end', () => {
+    .once('end', () => {
         log.stopTime = new Date().toISOString();
         fs.writeFileSync(config.resultsPath + '/' + index + '.json', JSON.stringify(log));
         if (++index < queries.length) {
           runQuery(queries, index, planner, queryTemplate);
         }
       })
+    .once('clusters-found', (clusters) => {
+      // Do something with clusters
+    })
     .on('error', (error) => {
         log.error = error.message;
         fs.writeFileSync(config.resultsPath + '/' + index + '.json', JSON.stringify(log));

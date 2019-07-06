@@ -56,8 +56,17 @@ export default class Planner implements EventEmitter {
       }
     });
 
-    this.context.on("could-not-find-path", (e) => {
-      iterator.emit("end", "end");
+    this.context.on(EventType.PathNotFound, (e) => {
+      iterator.emit("end");
+    });
+
+    let clustersFound: boolean = false;
+    this.context.once(EventType.ClustersFound, (clusters) => {
+      // console.log(query);
+      if (!clustersFound) {
+        clustersFound = true;
+        iterator.emit("clusters-found", clusters);
+      }
     });
 
     return iterator;

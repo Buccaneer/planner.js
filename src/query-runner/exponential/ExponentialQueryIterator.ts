@@ -1,5 +1,6 @@
 import { AsyncIterator } from "asynciterator";
 import Context from "../../Context";
+import EventType from "../../enums/EventType";
 import { DurationMs } from "../../interfaces/units";
 import IResolvedQuery from "../IResolvedQuery";
 
@@ -30,7 +31,7 @@ export default class ExponentialQueryIterator extends AsyncIterator<IResolvedQue
 
   public read(): IResolvedQuery {
     if (this.stop) { // STOP INSTEAD OF EXPONENTIAL
-      this.context.emit("could-not-find-path", "could-not-find-path");
+      this.context.emit(EventType.PathNotFound);
       this.close();
     }
     if (this.closed) {
@@ -43,7 +44,7 @@ export default class ExponentialQueryIterator extends AsyncIterator<IResolvedQue
     this.timespan *= 2;
     this.stop = true; // SET STOP FLAG
 
-    console.log(this.baseQuery);
+    // console.log(this.baseQuery);
 
     return Object.assign({}, this.baseQuery, {maximumArrivalTime});
   }

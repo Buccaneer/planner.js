@@ -55,7 +55,7 @@ describe("[QueryRunnerExponential]", () => {
         reachableStopsFinder,
         reachableStopsFinder,
         createJourneyExtractor(),
-        new ClusterFinder(),
+        new ClusterFinder(null),
       );
     };
 

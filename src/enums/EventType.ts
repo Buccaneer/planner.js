@@ -15,6 +15,10 @@ enum EventType {
   FinalReachableStops = "final-reachable-stops",
   InitialReachableStops = "initial-reachable-stops",
   AddedNewTransferProfile = "added-new-transfer-profile",
+
+  PathNotFound = "path-not-found",
+  ClustersFound = "clusters-found",
+
 }
 
 export default EventType;

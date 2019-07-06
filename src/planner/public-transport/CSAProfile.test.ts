@@ -46,7 +46,7 @@ describe("[PublicTransportPlannerCSAProfile]", () => {
         reachableStopsFinder,
         reachableStopsFinder,
         journeyExtractor,
-        new ClusterFinder(),
+        new ClusterFinder(null),
       );
     };
 
@@ -198,7 +198,7 @@ describe("[PublicTransportPlannerCSAProfile]", () => {
         reachableStopsFinder,
         reachableStopsFinder,
         journeyExtractor,
-        new ClusterFinder(),
+        new ClusterFinder(null),
       );
 
       return new QueryRunnerDefault(locationResolver, CSA);
